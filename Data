@@ -1,0 +1,32 @@
+import hashlib
+import os
+
+# Function to hash an email with a random salt
+def hash_email(email):
+    # Generate a random 16-byte salt
+    salt = os.urandom(16)
+    
+    # Combine salt and email, then hash using SHA-256
+    email_hash = hashlib.sha256(salt + email.encode()).hexdigest()
+    
+    # Return salt and hash as hex values for storage
+    return salt.hex(), email_hash
+
+# Function to verify an email using a stored salt and hash
+def verify_email(stored_salt, stored_hash, email_input):
+    # Recreate the hash using the stored salt and input email
+    new_hash = hashlib.sha256(bytes.fromhex(stored_salt) + email_input.encode()).hexdigest()
+    
+    # Compare newly generated hash with stored hash
+    return new_hash == stored_hash
+
+# Example usage:
+email = "employee@example.com"
+
+# Hash the email
+salt, email_hash = hash_email(email)
+print(f"Salt: {salt}, Hashed Email: {email_hash}")
+
+# Verify the email using stored values
+is_valid = verify_email(salt, email_hash, "employee@example.com")
+print(f"Is the email valid? {is_valid}")
